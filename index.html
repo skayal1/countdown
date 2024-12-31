@@ -1,0 +1,191 @@
+<html>
+ <head>
+  <title>
+   Happy New Year Countdown
+  </title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <style>
+   body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #282c34;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            animation: fadeInOut 10s infinite;
+        }
+        .container {
+            text-align: center;
+            z-index: 1;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        p{font-size:30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);}
+
+        .countdown {
+            font-size: 3em;
+            margin: 20px 0;
+            font-weight: 600;
+            animation: pulse 1s infinite;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .message {
+            font-size: 2em;
+            margin-top: 20px;
+            animation: bounceIn 2s ease-in-out;
+        }
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+  </style>
+ </head>
+ <body>
+  <img alt="New Year celebration with fireworks in a major city" class="background-image" height="1080" id="backgroundImage" src="https://storage.googleapis.com/a1aa/image/fxfxWRmkiksVnkjoUTQSVfMW3D6m57NejHo96szVu1oLz3BQB.jpg" width="1920"/>
+  <div class="container">
+   <p>
+    Happy New Year Countdown
+   </p>
+   <div class="countdown" id="countdown">
+    0d 0h 47m 5s
+   </div>
+   <div class="message" id="message">
+   </div>
+  </div>
+  <canvas class="confetti" id="confetti">
+  </canvas>
+  <script>
+   const images = [
+            "images/i1.jpeg",
+            "images/i2.jpeg",
+            "images/i3.jpeg",
+            "images/i4.jpeg",
+            "images/i5.jpeg",
+            "images/i6.jpeg",
+            "images/i7.jpeg"
+        ];
+
+        let currentImageIndex = 0;
+
+        function changeBackgroundImage() {
+            const backgroundImage = document.getElementById('backgroundImage');
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            backgroundImage.src = images[currentImageIndex];
+        }
+
+        setInterval(changeBackgroundImage, 10000);
+
+        function updateCountdown() {
+            const now = new Date();
+            const nextYear = new Date(now.getFullYear() + 1, 0, 1);
+            const diff = nextYear - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('countdown').innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            if (diff < 0) {
+                document.getElementById('countdown').innerHTML = "00:00:00";
+                document.getElementById('message').innerHTML = "Wish You a Very Happy New Year!";
+                startConfetti();
+            }
+        }
+
+        function startConfetti() {
+            const confettiCanvas = document.getElementById('confetti');
+            const confettiContext = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            const confettiPieces = [];
+            const confettiCount = 300;
+            for (let i = 0; i < confettiCount; i++) {
+                confettiPieces.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height,
+                    r: Math.random() * 6 + 2,
+                    d: Math.random() * confettiCount,
+                    color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+                    tilt: Math.random() * 10 - 10,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+                    tiltAngle: 0
+                });
+            }
+
+            function drawConfetti() {
+                confettiContext.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+                confettiPieces.forEach((piece, index) => {
+                    confettiContext.beginPath();
+                    confettiContext.lineWidth = piece.r;
+                    confettiContext.strokeStyle = piece.color;
+                    confettiContext.moveTo(piece.x + piece.tilt + piece.r / 2, piece.y);
+                    confettiContext.lineTo(piece.x + piece.tilt, piece.y + piece.tilt + piece.r / 2);
+                    confettiContext.stroke();
+                });
+                updateConfetti();
+            }
+
+            function updateConfetti() {
+                confettiPieces.forEach((piece, index) => {
+                    piece.tiltAngle += piece.tiltAngleIncremental;
+                    piece.y += (Math.cos(piece.d) + 3 + piece.r / 2) / 2;
+                    piece.tilt = Math.sin(piece.tiltAngle - index / 3) * 15;
+                    if (piece.y > confettiCanvas.height) {
+                        piece.x = Math.random() * confettiCanvas.width;
+                        piece.y = -20;
+                    }
+                });
+            }
+
+            function animateConfetti() {
+                drawConfetti();
+                requestAnimationFrame(animateConfetti);
+            }
+
+            animateConfetti();
+        }
+
+        setInterval(updateCountdown, 1000);
+  </script>
+ </body>
+</html>
